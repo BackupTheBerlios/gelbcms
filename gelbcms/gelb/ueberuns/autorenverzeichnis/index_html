@@ -1,0 +1,77 @@
+<dtml-call expr="REQUEST.set('layoutMode_seitenleisteLinks','false')">
+
+<dtml-var gelb_top.dtml>
+
+<dtml-if expr="REQUEST.has_key('group')">
+    <dtml-call expr="REQUEST.set('group',_.int(REQUEST.group))"> <!-- type cast to int -->
+<dtml-else>
+    <dtml-call expr="REQUEST.set('group',1)">
+</dtml-if>
+
+<table>
+    <tr>
+        <td>
+        </td>
+        <td>
+            <h1>Die Autoren.</h1>
+            <br>
+            <h2 class="autorenGruppe">
+                <dtml-if expr="REQUEST.group==1">
+                    &gt;&gt;&nbsp;A-M
+                <dtml-else>
+                    <a href="&dtml-absolute_url;?group=1" class="autorenGruppe">&gt;&gt;&nbsp;A-M</a>
+                </dtml-if>
+                &nbsp;&nbsp; 
+                <dtml-if expr="REQUEST.group==2">
+                    &gt;&gt;&nbsp;N-Z
+                <dtml-else>
+                    <a href="&dtml-absolute_url;?group=2" class="autorenGruppe">&gt;&gt;&nbsp;N-Z</a>
+                </dtml-if>
+            </h2>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2">
+            &nbsp;
+        </td>
+    </tr>
+
+
+    <dtml-in expr="PARENTS[0].objectValues('GELB_Autor')" sort="id">
+        <dtml-if expr="((REQUEST.group==1) and (id<'n')) or ((REQUEST.group==2) and (id>='n'))">    <!--(REQUEST.from &lt;= id[0]) AND (REQUEST.to &gt;= id[0])-->
+            <a name="&dtml-id;">
+            <tr>
+                <td class="autorBild">
+                    <dtml-if bild>
+                        <dtml-var expr="bild.tag()">
+                    </dtml-if>
+                </td>
+                <td class="autor">
+                    <p class="autorName">
+                        &dtml-name;
+                    </p>
+                    <dtml-if infotext>
+                        <p class="autorInfotext">
+                            <dtml-var infotext>
+                        </p>
+                    </dtml-if>
+                    <dtml-if homepage>
+                        <p class="autorHomepage">
+                            <a href="&dtml-homepage;">&dtml-homepage;</a>
+                        </p>
+                    </dtml-if>
+                    <dtml-if email>
+                        <p class="autorEmail">
+                            <a href="mailto:&dtml-email;">&dtml-email;</a>
+                        </p>
+                    </dtml-if>
+                    <p class="autorArtikellink">
+                        <a href="artikel.dtml?author=&dtml-id;" onclick="window.open('artikel.dtml?author=&dtml-id;','artikelliste_&dtml-id;','width=300,height=500,top=200,left=400,resizable=yes,scrollbars=yes,menubar=no,status=yes');return false" class="autorArtikellink">&gt;&gt; Artikel von &dtml-name; in der Gelb</a>
+                    </p>
+                </td>
+            </tr>
+        </dtml-if>
+    </dtml-in>
+</table>
+
+<dtml-var gelb_bottom.dtml>

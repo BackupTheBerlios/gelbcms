@@ -1,0 +1,6 @@
+<dtml-var gelb_top.dtml>
+
+<h1>Hier ist der Dialog</h1>
+Genau. Hier ist er.
+
+<dtml-var gelb_bottom.dtml>

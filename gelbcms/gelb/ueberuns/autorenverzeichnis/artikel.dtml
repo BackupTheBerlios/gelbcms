@@ -1,0 +1,45 @@
+<dtml-comment>
+*******************************************************************************
+
+Project:     gelb cms
+
+File:        /gelb/dialog/termine.dtml
+
+             List of all articles by one specific author.
+
+Parameters:  "author"    id of author, identical to entry-name in
+                         ../autorenverzeichnis
+
+Version:  0.9
+Date:     2004-02-25
+Author:   Jens Gulden
+   
+*******************************************************************************
+</dtml-comment>
+
+<dtml-var gelb_header.dtml>
+
+<dtml-with expr="gelb.ueberuns.autorenverzeichnis[REQUEST.author]">
+    <h1 class="artikelliste">Artikel von &dtml-name;</h1>
+</dtml-with>
+
+<dtml-in expr="gelb.archiv.objectValues('Folder')" prefix="ausgabe">
+    <dtml-in expr="objectValues('GELB_Artikel')" prefix="artikel">
+        <dtml-call expr="REQUEST.set('showArtikel','false')">
+        <dtml-let aut="artikel_item.autoren">
+            <dtml-in expr="_.string.split(aut,',')" prefix="auth">
+                <dtml-if expr="auth_item==REQUEST.author">
+                    <dtml-call expr="REQUEST.set('showArtikel','true')">
+                </dtml-if>
+            </dtml-in>
+            <dtml-if expr="REQUEST.showArtikel=='true'">
+                <p class="artikelliste">
+                    <span class="artikellisteAusgabe"><dtml-var expr="ausgabe_item.title"> - <dtml-var expr="ausgabe_item.zeitraum"></span><br>
+                    <a href="<dtml-var expr="artikel_item.absolute_url()">" target="_parent" class="artikelliste"><dtml-var expr="artikel_item.title"></a>
+                </p>
+            </dtml-if>
+        </dtml-let>    
+    </dtml-in>
+</dtml-in>
+
+<dtml-var gelb_footer.dtml>

@@ -1,0 +1,84 @@
+<dtml-comment>
+*******************************************************************************
+
+Project:  gelb cms
+
+File:     /gelb_header.dtml
+
+          HTML page start.
+
+Version:  0.9
+Date:     2004-02-25
+Author:   Jens Gulden
+   
+*******************************************************************************
+</dtml-comment>
+
+<html>
+<!-- **************************************************************************
+
+gelb cms 
+Zope-based content management system for gelb-magazin.de
+
+Version:    0.9
+Date:       2004-02-25
+Author:     Jens Gulden
+License:    GPL
+Homepage:   http://gelbcms.berlios.de/
+
+*************************************************************************** -->
+<header>
+<title>gelb <dtml-if expr="title_or_id()!='Zope'">- <dtml-var title_or_id></dtml-if></title>
+<link rel="stylesheet" type="text/css" href="/gelb.css">
+<script language="JavaScript">
+<!--
+    function getById(id) {
+        var result;
+        if (document.all) {
+            result=eval("document.all."+id); // IE
+        } else {
+            result=eval("document."+id); // old Netscape
+            if (result==null) {
+                result=document.getElementById(id); // new Netscape, Konqueror
+            }
+        }
+        return result;
+    }
+
+    function layerVisible(layerId,visibility) {
+        if (layerId!=null) {
+            var layer=getById(layerId);
+            var visibilityStr=(visibility?"visible":"hidden");
+            if (layer) {
+                if (layer.style) {
+                    layer.style.visibility=visibilityStr; // IE, new Netscape
+                } else {
+                    layer.visibility=visibilityStr; // old Netscape
+                }
+            }
+        }
+        if (visibility) { // showing one layer means hiding all others
+            <dtml-with gelb>
+                <dtml-in expr="(0,1,2,3)" prefix="counter">
+                    <dtml-with expr="objectValues('Folder')[counter_item]">
+
+                        if (layerId!='layer_<dtml-var id>') {
+                            layerVisible('layer_<dtml-var id>',false);
+                            getById('td_<dtml-var id>').style.backgroundColor='&dtml-color;'
+                        }
+
+                    </dtml-with>
+                </dtml-in>
+            </dtml-with>
+        }
+    }
+// -->
+</script>
+</header>
+
+<dtml-if expr="REQUEST.has_key('view')">
+<dtml-else>
+    <dtml-call expr="REQUEST.set('view','main')">
+</dtml-if>
+
+<body class="<dtml-var expr="REQUEST.view">">

@@ -1,0 +1,61 @@
+<dtml-comment>
+*******************************************************************************
+
+Project:  gelb cms
+
+File:     /gelb/dialog/links.dtml
+
+          Full list of all existing instances of GELB_Link.
+
+Version:  0.9
+Date:     2004-02-25
+Author:   Jens Gulden
+   
+*******************************************************************************
+</dtml-comment>
+
+<dtml-var gelb_top.dtml>
+
+<h1 class="list">Links</h1>
+
+<p class="list">
+Liste aller Web-Links in den Artikeln der gelb:
+</p>
+
+<dtml-comment>
+--- find all links in all articles --------------------------------------------
+</dtml-comment>
+<table>
+    <tr>
+        <dtml-call expr="REQUEST.set('boxCount',0)">
+        <dtml-with gelb>
+            <dtml-with archiv>
+                <dtml-in expr="objectValues('Folder')" sort_expr="id" reverse prefix="ausgabe">
+                    <dtml-in expr="objectValues(('GELB_Artikel'))" prefix="artikel">
+                        <dtml-in expr="objectValues(('GELB_Link'))">
+                            <dtml-if expr="(REQUEST.get('boxCount')>0) and (REQUEST.get('boxCount') % 4 == 0)">
+                        </tr>
+                        <tr>
+                            </dtml-if>
+                            <td class="artikelBox">
+                                <p class="artikelBoxEntryHead">
+                                    <h2 class="artikelBoxEntry"><dtml-var title></h2>
+                                    <a href="<dtml-var url>" target="_blank" class="artikelBoxEntryLink"><dtml-var url></a>
+                                </p>
+                                <p class="artikelBoxEntry">
+                                    <dtml-var text>
+                                </p>
+                                <p class="artikelBoxEntry">
+                                    (erschienen in:<br>
+                                    <a href="<dtml-var "artikel_item.absolute_url()">" class="artikelBoxEntry"><dtml-var "ausgabe_item.title"></a>)
+                                </p>
+                            </td>
+                        </dtml-in>
+                    </dtml-in>
+                </dtml-in>
+            </dtml-with>
+        </dtml-with>
+    </tr>
+</table>
+
+<dtml-var gelb_bottom.dtml>

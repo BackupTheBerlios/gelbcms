@@ -1,0 +1,18 @@
+<dtml-comment>
+*******************************************************************************
+
+Project:  gelb cms
+
+File:     /gelb_footer.dtml
+
+          HTML page end.
+
+Version:  0.9
+Date:     2004-02-25
+Author:   Jens Gulden
+   
+*******************************************************************************
+</dtml-comment>
+
+</body>
+</html>

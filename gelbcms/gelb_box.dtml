@@ -1,0 +1,19 @@
+<dtml-comment>
+*******************************************************************************
+
+Project:  gelb cms
+
+File:     /gelb_box.dtml
+
+          Outputs a yellow box.
+
+Version:  0.9
+Date:     2004-02-25
+Author:   Jens Gulden
+   
+*******************************************************************************
+</dtml-comment>
+
+<table><tr><td class="<dtml-var expr="REQUEST.get('boxClass')">">
+<dtml-var expr="REQUEST.get('boxText')">
+</td></tr></table>

@@ -1,0 +1,17 @@
+<dtml-comment>
+*******************************************************************************
+
+Project:  gelb cms
+
+File:     /Control_Panel/Products/GELB_Site/GELB_Autor/.../link
+
+          Displays an HTML-link to the author's entry in the authors-list.
+
+Version:  0.9
+Date:     2004-02-25
+Author:   Jens Gulden
+   
+*******************************************************************************
+</dtml-comment>
+
+<dtml-let thisId="id" thisName="name"><dtml-with gelb><dtml-with ueberuns><dtml-with autorenverzeichnis><a href="<dtml-var absolute_url>?group=<dtml-if expr="thisId < 'n'">1<dtml-else>2</dtml-if>#<dtml-var thisId>"><dtml-var thisName></a></dtml-with></dtml-with></dtml-with></dtml-let>

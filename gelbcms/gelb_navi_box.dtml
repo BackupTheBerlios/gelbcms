@@ -1,0 +1,39 @@
+<dtml-comment>
+*******************************************************************************
+
+Project:  gelb cms
+
+File:     /gelb_navi_box.dtml
+
+          Outputs a single navigator menu box.
+
+Version:  0.9
+Date:     2004-02-25
+Author:   Jens Gulden
+   
+*******************************************************************************
+</dtml-comment>
+
+<dtml-with naviElement>
+    <dtml-if expr="id==aktiverBereichId"> <dtml-comment>aktiver Bereich</dtml-comment>
+        <td id="td_&dtml-id;"
+            class="&dtml-mode;"
+            bgcolor="&dtml-naviHighlightColor;"
+            onmouseover="layerVisible(null,true);this.style.backgroundColor='&dtml-naviHighlightColor;'">
+            <a href="<dtml-var absolute_url>" class="noUnderline"><dtml-with toc_text><dtml-var tag></dtml-with></a>
+        </td>
+    <dtml-else>
+        <td id="td_&dtml-id;" class="&dtml-mode;" bgcolor="&dtml-color;" 
+onmouseover="<dtml-if aktiverBereichId>getById('td_&dtml-aktiverBereichId;').style.backgroundColor='<dtml-var
+aktiverBereichFarbe>';</dtml-if>this.style.backgroundColor='&dtml-naviHighlightColor;'<dtml-if
+expr="mode=='navi'">;layerVisible('layer_&dtml-id;',true)</dtml-if>"
+<dtml-comment>           
+<!--onmouseout="<dtml-if aktiverBereichId>getById('td_&dtml-aktiverBereichId;').style.backgroundColor='&dtml-naviHighlightColor;';</dtml-if>this.style.backgroundColor='&dtml-color;'<dtml-if
+expr="mode=='navi'">;layerVisible('layer_&dtml-id;',false)</dtml-if>"-->
+</dtml-comment>
+onmousedown="<dtml-if expr="mode=='navi'">layerVisible('layer_&dtml-id;',true);</dtml-if>window.location.href='<dtml-var absolute_url>'"
+        >
+            <a href="<dtml-var absolute_url>" class="noUnderline"><dtml-with toc_text><dtml-var tag></dtml-with></a>
+        </td>
+    </dtml-if>
+</dtml-with>

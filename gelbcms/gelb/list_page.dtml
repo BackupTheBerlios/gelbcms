@@ -1,0 +1,79 @@
+<dtml-comment>
+*******************************************************************************
+
+Project:  gelb cms
+
+File:     /gelb/list_page.dtml
+
+          Outputs list of entries onto main page.
+
+Version:  0.9
+Date:     2004-02-25
+Author:   Jens Gulden
+   
+*******************************************************************************
+</dtml-comment>
+
+<dtml-with expr="REQUEST.listParent">
+    <h1 class="list">
+        &dtml-title_or_id;
+    </h1>
+
+    <dtml-comment>
+    --- if available, display list head ---------------------------------------
+    </dtml-comment>
+    <dtml-try>
+        <dtml-if expr="REQUEST.listParent['listenkopf.dtml']">
+            <dtml-comment>
+            (will throw error if non-existent on current object)
+            </dtml-comment>
+            <dtml-var listenkopf.dtml>
+        </dtml-if>
+    <dtml-except>    
+    </dtml-try>
+
+    <dtml-in expr="objectValues(('Folder','DTML Document','GELB_Artikel'))" sort="id" prefix="entryObject">
+        <dtml-comment>
+        --- if it's an issue, make sure it is released yet or this is 
+        --- accessed by an authorized user
+        </dtml-comment>
+        <dtml-call expr="REQUEST.set('freigg','false')">
+        <dtml-try>
+            <dtml-call expr="REQUEST.set('freigg',entryObject_item.freigegeben)">
+            <dtml-comment>
+            (usually fails, but may set REQUEST.freigg to 'on' if this is a released issue)
+            </dtml-comment>
+        <dtml-except AttributeError>
+        </dtml-try>
+        <dtml-if expr="(PARENTS[0]!=gelb.archiv) or (REQUEST.freigg!='false') or (_.SecurityGetUser().getUserName()!='Anonymous User')">
+            <dtml-if title>
+                <h2 class="list">
+                    <a class="list" href="&dtml-absolute_url;">&dtml-title; <dtml-var expr="gelb.marker1.tag()"></a>
+                </h2>
+                <p class="list">
+                    <dtml-if subtitle>
+                        &dtml-subtitle;
+                    </dtml-if>
+                    <dtml-if autoren>
+                        <span class="listAutoren">
+                        // <dtml-in expr="_.string.split(autoren,',')" prefix="author"><dtml-in expr="gelb.ueberuns.autorenverzeichnis.objectItems('GELB_Autor')"><dtml-if expr="getId()==author_item"><dtml-if expr="author_index > 0">, </dtml-if><dtml-var link_uppercase></dtml-if></dtml-in></dtml-in>
+                        </span>
+                    </dtml-if>
+                </p>
+            </dtml-if>
+        </dtml-if>
+    </dtml-in>
+    
+    <dtml-comment>
+    --- if available, display list foot ---------------------------------------
+    </dtml-comment>
+    <dtml-try>
+        <dtml-if expr="REQUEST.listParent['listenfuss.dtml']"> 
+            <dtml-comment>
+            (will throw error if non-existent on current object)
+            </dtml-comment>
+            <dtml-var listenfuss.dtml>
+        </dtml-if>
+    <dtml-except>    
+    </dtml-try>
+</dtml-with>

@@ -1,0 +1,252 @@
+<dtml-comment>
+*******************************************************************************
+
+Project:  gelb cms
+
+File:     /gelb/dialog/termine.dtml
+
+          Full list and search mask of all existing instances of GELB_Termin.
+
+Version:  0.9
+Date:     2004-02-25
+Author:   Jens Gulden
+   
+*******************************************************************************
+</dtml-comment>
+
+<dtml-var gelb_top.dtml>
+
+<h1 class="list">Termine</h1>
+
+<dtml-let monthNames="['Januar','Februar','M&auml;rz','April','Mai','Juni','Juli','August','September','Oktober','November','Dezember']">
+
+<dtml-comment>
+--- find all dates in all articles --------------------------------------------
+</dtml-comment>
+    <dtml-with gelb>
+        <dtml-with archiv>
+            <dtml-comment>
+            --- find earliest / latest date -----------------------------------
+            </dtml-comment>
+            <dtml-call expr="REQUEST.set('earliestDate',ZopeTime())">
+            <dtml-call expr="REQUEST.set('latestDate',ZopeTime())">
+            <dtml-in expr="objectValues('Folder')">
+                <dtml-in expr="objectValues(('GELB_Artikel'))">
+                    <dtml-in expr="objectValues(('GELB_Termin'))" prefix="termin">
+                        <dtml-if expr="REQUEST.has_key('show_outdated') or termin_item.date_start.isFuture() or termin_item.date_end.isFuture() or termin_item.date_start.isCurrentDay() or termin_item.date_end.isCurrentDay()">
+                            <dtml-if expr="termin_item.date_start.lessThan(REQUEST.get('earliestDate'))">
+                                 <dtml-call expr="REQUEST.set('earliestDate',termin_item.date_start)">
+                            </dtml-if>
+                            <dtml-if expr="termin_item.date_end.lessThan(REQUEST.get('earliestDate'))">
+                                 <dtml-call expr="REQUEST.set('earliestDate',termin_item.date_end)">
+                            </dtml-if>
+                            <dtml-if expr="termin_item.date_start.greaterThan(REQUEST.get('latestDate'))">
+                                 <dtml-call expr="REQUEST.set('latestDate',termin_item.date_start)">
+                            </dtml-if>
+                            <dtml-if expr="termin_item.date_end.greaterThan(REQUEST.get('latestDate'))">
+                                 <dtml-call expr="REQUEST.set('latestDate',termin_item.date_end)">
+                            </dtml-if>
+                        </dtml-if>
+                    </dtml-in>
+                </dtml-in>
+            </dtml-in>
+            <dtml-if expr="REQUEST.has_key('show')">
+                <dtml-comment>
+                --- make sure "show" is a list
+                </dtml-comment>
+                <dtml-try>
+                    <dtml-in "REQUEST.get('show')">
+                    </dtml-in>
+                <dtml-except InError>
+                    <dtml-call expr="REQUEST.set('show',[REQUEST.get('show')])">
+                </dtml-try>
+            <dtml-else>
+                <dtml-call expr="REQUEST.set('show', [] )">
+                <dtml-comment>
+                --- by default, show dates starting from current month
+                </dtml-comment>
+                <dtml-call expr="REQUEST.set('monthStart',ZopeTime().month())">
+                <dtml-call expr="REQUEST.set('monthEnd',12)">
+                <dtml-in expr="_.range(ZopeTime().year(), REQUEST.get('latestDate').year()+1)" prefix="y">
+                    <dtml-in expr="_.range(REQUEST.get('monthStart'),REQUEST.get('monthEnd')+1)" prefix="m">
+                        <dtml-call expr="REQUEST.get('show').append( _.str(y_item) + ('-') + _.str(m_item) )">
+                    </dtml-in>
+                    <dtml-call expr="REQUEST.set('monthStart',1)">
+                    <dtml-if expr="y_item==REQUEST.get('latestDate').year()-1">
+                        <dtml-call expr="REQUEST.set('monthEnd',REQUEST.get('latestDate').month())">
+                    </dtml-if>
+                </dtml-in>
+            </dtml-if>
+
+            <table class="termineBackground"><tr><td>
+            <form method="GET">
+            <table>
+                <tr>
+                    <td>
+                        <dtml-comment>
+                        --- output months list from earliest to latest date ---
+                        </dtml-comment>
+                        <table class="termineMenu">
+                            <tr class="termineMenu">
+                                <td class="termineMenu"></td>
+                                <td class="termineMenuMonth">J</td>
+                                <td class="termineMenuMonth">F</td>
+                                <td class="termineMenuMonth">M</td>
+                                <td class="termineMenuMonth">A</td>
+                                <td class="termineMenuMonth">M</td>
+                                <td class="termineMenuMonth">J</td>
+                                <td class="termineMenuMonth">J</td>
+                                <td class="termineMenuMonth">A</td>
+                                <td class="termineMenuMonth">S</td>
+                                <td class="termineMenuMonth">O</td>
+                                <td class="termineMenuMonth">N</td>
+                                <td class="termineMenuMonth">D</td>
+                            </tr>
+                            <dtml-call expr="REQUEST.set('monthStart',REQUEST.get('earliestDate').month())">
+                            <dtml-call expr="REQUEST.set('monthEnd',12)">
+                            <dtml-in expr="_.range(REQUEST.get('earliestDate').year(), REQUEST.get('latestDate').year()+1)" prefix="y">
+                                <tr class="termineMenu">
+                                    <td class="termineMenuYear"> 
+                                        <dtml-var y_item>
+                                    </td>
+                                    <dtml-if expr="y_item == REQUEST.get('latestDate').year()">
+                                        <dtml-call expr="REQUEST.set('monthEnd',REQUEST.get('latestDate').month())">
+                                    </dtml-if>
+                                    <dtml-in expr="_.range(1,13)" prefix="m">
+                                        <td class="termineMenu">
+                                            <dtml-if expr="(m_item >= REQUEST.get('monthStart')) and (m_item <= REQUEST.get('monthEnd'))">
+                                                <dtml-comment>
+                                                --- count number of dates in this month
+                                                </dtml-comment>
+                                                <dtml-call expr="REQUEST.set('count',0)">
+                                                <dtml-if expr="m_item==12">
+                                                    <dtml-call expr="REQUEST.set('nextM',1)">
+                                                    <dtml-call expr="REQUEST.set('nextY',y_item+1)">
+                                                <dtml-else> 
+                                                    <dtml-call expr="REQUEST.set('nextM',m_item+1)">
+                                                    <dtml-call expr="REQUEST.set('nextY',y_item)">
+                                                </dtml-if>
+                                                <dtml-let currentMonthStart="_.DateTime(y_item,m_item,1)"
+                                                          currentMonthEnd="_.DateTime(REQUEST.get('nextY'),REQUEST.get('nextM'),1)">
+                                                    <dtml-in expr="objectValues('Folder')">
+                                                        <dtml-in expr="objectValues(('GELB_Artikel'))">
+                                                            <dtml-in expr="objectValues(('GELB_Termin'))" prefix="termin">
+                                                                <dtml-if expr="REQUEST.has_key('show_outdated') or termin_item.date_start.isFuture() or termin_item.date_end.isFuture() or termin_item.date_start.isCurrentDay() or termin_item.date_end.isCurrentDay()">
+                                                                    <dtml-if expr="termin_item.date_start.lessThan(currentMonthEnd) and termin_item.date_end.greaterThanEqualTo(currentMonthStart)">
+                                                                        <dtml-call expr="REQUEST.set('count',REQUEST.get('count')+1)">
+                                                                    </dtml-if>
+                                                                </dtml-if>
+                                                            </dtml-in>
+                                                        </dtml-in>
+                                                    </dtml-in>
+                                                </dtml-let>
+                                                <dtml-if expr="REQUEST.get('count')>0">
+                                                    <dtml-comment>
+                                                    --- test if "year-month" is among selections
+                                                    </dtml-comment>
+                                                    <dtml-call expr="REQUEST.set('found',0)">
+                                                    <dtml-in expr="REQUEST.get('show')" prefix="show">
+                                                        <dtml-let yStr="show_item[0:4]"
+                                                                  mStr="show_item[5:7]">
+                                                        <dtml-let y="_.int(yStr)"
+                                                                  m="_.int(mStr)">
+                                                            <dtml-if expr="y==y_item and m==m_item">
+                                                                <dtml-call expr="REQUEST.set('found',1)">
+                                                            </dtml-if>
+                                                        </dtml-let>
+                                                        </dtml-let>
+                                                    </dtml-in>
+                                                    <input type="checkbox" class="termineMenu" name="show" value="<dtml-var y_item>-<dtml-var m_item>" <dtml-if expr="REQUEST.get('found')==1">checked</dtml-if>>
+                                                </dtml-if>
+                                            </dtml-if>
+                                        </td>
+                                    </dtml-in>
+                                    <dtml-call expr="REQUEST.set('monthStart',1)">
+                                </tr>
+                            </dtml-in>
+                        </table>
+                    </td>
+                    <td>
+                        &nbsp;
+                    </td>
+                    <td class="termineSubmit">
+                        abgelaufene&nbsp;<input type="checkbox" class="termineSubmitCheckbox" name="show_outdated" <dtml-if expr="REQUEST.has_key('show_outdated')">checked</dtml-if>><br>
+                        <br>
+                        <input type="submit" class="termineSubmit" value="Anzeigen">
+                    </td>
+                </tr>
+            </table>
+            </form>
+            </td></tr></table>
+
+            <dtml-comment>
+            --- output dates in selected months -------------------------------
+            </dtml-comment>
+            <dtml-in expr="REQUEST.get('show')" prefix="show">
+                <dtml-let yStr="show_item[0:4]"
+                          mStr="show_item[5:7]"
+                          y="_.int(yStr)"
+                          m="_.int(mStr)">
+                    <h2 class="list"><dtml-var expr="monthNames[m-1]"> <dtml-var y> <dtml-var expr="gelb.marker1.tag()"></h2>
+                    <dtml-call expr="REQUEST.set('boxCount',0)">
+                    <table>
+                        <tr>
+                            <dtml-if expr="m==12">
+                                <dtml-call expr="REQUEST.set('nextM',1)">
+                                <dtml-call expr="REQUEST.set('nextY',y+1)">
+                            <dtml-else> 
+                                <dtml-call expr="REQUEST.set('nextM',m+1)">
+                                <dtml-call expr="REQUEST.set('nextY',y)">
+                            </dtml-if>
+                            <dtml-let currentMonthStart="_.DateTime(y,m,1)"
+                                      currentMonthEnd="_.DateTime(REQUEST.get('nextY'),REQUEST.get('nextM'),1)">
+                                <dtml-in expr="objectValues('Folder')" prefix="ausgabe">
+                                    <dtml-in expr="objectValues(('GELB_Artikel'))" prefix="artikel">
+                                        <dtml-in expr="objectValues(('GELB_Termin'))" prefix="termin">
+                                            <dtml-comment>
+                                            --- is in showing month?
+                                            </dtml-comment>
+                                            <dtml-if expr="(termin_item.date_start.lessThan(currentMonthEnd) and termin_item.date_end.greaterThanEqualTo(currentMonthStart) )
+                                                           and
+                                                           (REQUEST.has_key('show_outdated') or termin_item.date_start.isFuture() or termin_item.date_end.isFuture() or termin_item.date_start.isCurrentDay() or termin_item.date_end.isCurrentDay())">
+                                                <!--<li>
+                                                    <i><dtml-var "termin_item.date_start"> - <dtml-var "termin_item.date_end"></i>
+                                                    <dtml-var "termin_item.title">
+                                                </li>-->
+                                                <dtml-if expr="(REQUEST.get('boxCount')>0) and (REQUEST.get('boxCount') % 4 == 0)">
+                                            </tr>
+                                            <tr>
+                                                </dtml-if>
+                                                <dtml-call expr="REQUEST.set('boxCount',REQUEST.get('boxCount')+1)">
+                                                <td>
+                                                    <table>
+                                                        <td class="artikelBox">
+                                                            <dtml-with termin_item>
+                                                                <p class="artikelBoxEntryHead">
+                                                                    <h2 class="artikelBoxEntry"><dtml-var title></h2>
+                                                                </p>
+                                                                <p class="artikelBoxEntry">
+                                                                    <dtml-var text>
+                                                                </p>
+                                                                <p class="artikelBoxEntry">
+                                                                    (erschienen in:<br>
+                                                                    <a href="<dtml-var "artikel_item.absolute_url()">" class="artikelBoxEntry"><dtml-var "ausgabe_item.title"></a>)
+                                                                </p>
+                                                            </dtml-with>
+                                                        </td>
+                                                    </table>
+                                                 </td>
+                                            </dtml-if>
+                                        </dtml-in>
+                                    </dtml-in>
+                                </dtml-in>
+                            </dtml-let>
+                        </tr>
+                    </table>
+                </dtml-let>
+            </dtml-in>
+        </dtml-with>
+    </dtml-with>
+</dtml-let>
+
+<dtml-var gelb_bottom.dtml>

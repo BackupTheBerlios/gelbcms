@@ -1,0 +1,102 @@
+<dtml-comment>
+*******************************************************************************
+
+Project:  gelb cms
+
+File:     /gelb_navi.dtml
+
+          gelb navigator.
+
+Version:  0.9
+Date:     2004-02-25
+Author:   Jens Gulden
+   
+*******************************************************************************
+</dtml-comment>
+
+<dtml-comment>
+--- find aktiverBereichId -----------------------------------------------------
+</dtml-comment>
+<dtml-call expr="REQUEST.set('aktiverBereichId','')">
+<dtml-call expr="REQUEST.set('aktiverBereichFarbe','')">
+<dtml-let thisId="this().getId()">
+    <dtml-in expr="gelb.objectItems('Folder')" prefix="bereich">
+        <dtml-if expr="(bereich_item.getId()==thisId) or ((thisId=='' or thisId=='gelb') and bereich_sequence_start)"> 
+            <dtml-comment>
+            --- Bereich gerade direkt aktiv, oder "archiv" fuer Startseite ----
+            </dtml-comment>
+            <dtml-call expr="REQUEST.set('aktiverBereichId',getId())"> 
+            <dtml-call expr="REQUEST.set('aktiverBereichFarbe',bereich_item.color)">
+        <dtml-else>
+            <dtml-comment>
+            --- search parent-path upwards ------------------------------------
+            </dtml-comment>
+            <dtml-in PARENTS>
+                <dtml-if expr="getId()==bereich_item.getId()">
+                    <dtml-call expr="REQUEST.set('aktiverBereichId',getId())">
+                    <dtml-comment>
+                    --- Bereich unter PARENTS gefunden ------------------------
+                    </dtml-comment>
+                    <dtml-call expr="REQUEST.set('aktiverBereichFarbe',bereich_item.color)">
+                </dtml-if>
+            </dtml-in>
+        </dtml-if>
+    </dtml-in>
+
+    <dtml-with gelb>
+        <dtml-let aktiverBereichId="REQUEST.aktiverBereichId"
+                  aktiverBereichFarbe="REQUEST.aktiverBereichFarbe"
+                  naviHighlightColor="global_naviHighlightColor">
+            <dtml-comment>
+            --- ausgelesen aus Folder-Property, nicht als StyleSheet-Agabe, 
+            --- da auch benutzt um JavaScript-Code zu generieren
+            </dtml-comment>
+            <dtml-if expr="mode=='naviMain'">
+                <br><br><br>
+                <center>
+            </dtml-if>
+            <table class="&dtml-mode;">
+                <tr>
+                    <td class="&dtml-mode;Home"><dtml-if expr="mode=='naviMain'"><dtml-with expr="REQUEST.neuesteAusgabe.titelicon_big"><img class="&dtml-mode;" src="&dtml-absolute_url;" width="&dtml-width;" height="&dtml-height;"></dtml-with><dtml-else><dtml-with expr="REQUEST.neuesteAusgabe.titelicon"><img class="&dtml-mode;" src="&dtml-absolute_url;" width="&dtml-width;" height="&dtml-height;"></dtml-with></dtml-if></td>
+
+                    <dtml-let naviElement="objectValues('Folder')[0]">
+                        <dtml-var gelb_navi_box.dtml>
+                    </dtml-let>
+                    <dtml-let naviElement="objectValues('Folder')[3]">
+                        <dtml-var gelb_navi_box.dtml>
+                    </dtml-let>
+                </tr>
+                <tr>
+                    <dtml-let naviElement="objectValues('Folder')[1]">
+                        <dtml-var gelb_navi_box.dtml>
+                    </dtml-let>
+                    <td colspan="2" rowspan="2" bgcolor="&dtml-naviHighlightColor;" class="subnavigation"><dtml-with "gelb.zero"><img src="<dtml-var absolute_url>" width="185" height="1"></dtml-with><br>
+                        <dtml-if expr="mode=='naviMain'">
+                            <dtml-with expr="REQUEST.neuesteAusgabe"><a href="&dtml-absolute_url;"><dtml-with expr="titelbild"><img class="&dtml-mode;" src="&dtml-absolute_url;" width="&dtml-width;" height="&dtml-height;" border="0" alt="<dtml-var expr="REQUEST.neuesteAusgabe.title">"></dtml-with></a></dtml-with>
+                        <dtml-else>
+                            <dtml-comment>
+                            --- sub-navigation directly (without layers)
+                            --- (see gelb_bottom for layers)
+                            </dtml-comment>
+                            <dtml-in expr="objectValues('Folder')">
+                                <dtml-if expr="getId()==aktiverBereichId">
+                                    <dtml-let aktuellerBereich="this()">
+                                        <dtml-var list_navigation.dtml>
+                                    </dtml-let>
+                                </dtml-if>
+                            </dtml-in>
+                        </dtml-if>
+                    </td>
+                </tr>
+                <tr>
+                    <dtml-let naviElement="objectValues('Folder')[2]">
+                        <dtml-var gelb_navi_box.dtml>
+                    </dtml-let>
+                </tr>
+            </table>
+            <dtml-if expr="mode=='naviMain'">
+                </center>
+            </dtml-if>
+        </dtml-let>
+    </dtml-with>
+</dtml-let>

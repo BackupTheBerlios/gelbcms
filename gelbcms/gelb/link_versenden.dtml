@@ -1,0 +1,139 @@
+<dtml-comment>
+*******************************************************************************
+
+Project:  gelb cms
+
+File:     /gelb/link_versenden.dtml
+
+          "Tell a friend" dialog page.
+
+Version:  0.9
+Date:     2004-02-25
+Author:   Jens Gulden
+   
+*******************************************************************************
+</dtml-comment>
+
+<html>
+<header>
+<title>gelb - Artikel versenden</title>
+<link rel="stylesheet" type="text/css" href="/gelb.css">
+<script language="JavaScript">
+<!--
+    function getById(id) {
+        var result;
+        if (document.all) {
+            result=eval("document.all."+id); // IE
+        } else {
+            result=eval("document."+id); // old Netscape
+            if (result==null) {
+                result=document.getElementById(id); // new Netscape, Konqueror
+            }
+        }
+        return result;
+    }
+
+    function validateEmail(email,msg) {
+        if ((email.value!="")&&(email.value.indexOf("@")!=-1)) {
+            return true;
+        } else {
+            alert(msg);
+            return false;
+        }
+    }
+    
+    function validate(txt,msg) {
+        if (txt.value!="") {
+            return true;
+        } else {
+            alert(msg);
+            return false;
+        }
+    }
+    
+    function validateForm() {
+        var ok=true;
+        if (!validateEmail(getById("f.email_to"),"Bitte gib eine gueltige Empfaengeradresse an.")) {
+            ok=false;
+        }
+        if (!validateEmail(getById("f.email_from"),"Bitte gib eine gueltige Absenderadresse an.")) {
+            ok=false;
+        }
+        if (!validate(getById("f.name"),"Bitte gib Deinen Namen an.")) {
+            ok=false;
+        }
+        return ok;
+    }
+// -->
+</script>
+</header>
+<body class="dialogTellAFriend">
+
+<dtml-if expr="REQUEST.has_key('email_to')">
+
+    <dtml-sendmail smtphost="mail.sitesprung.de">
+To: <dtml-var expr="REQUEST.email_to">
+From: <dtml-var expr="REQUEST.email_from">
+Subject: gelb Link von <dtml-var expr="REQUEST.name">
+
+
+Hallo!
+
+<dtml-var expr="REQUEST.name"> glaubt, dass Dich die "gelb" interessiert.
+Die "gelb" ist die Zeitung des Berliner KommunikationsFORUMs.
+
+<dtml-var expr="REQUEST.name"> kennst du hoffentlich.
+Was Du vielleicht noch nicht kennst ist der folgende Link:
+
+"<dtml-var expr="REQUEST.titel">" - <dtml-var expr="REQUEST.url">
+
+Vermutlich verweist der Link auf einen Artikel aus unserer Online-Ausgabe.
+Genau wissen wir das nicht. Sieh selbst.
+<dtml-if expr="REQUEST.message">
+
+<dtml-var expr="REQUEST.name"> jedenfalls laesst Dich wissen:
+---
+<dtml-var expr="REQUEST.message">
+---
+</dtml-if>
+
+gelb - www.gelb-magazin.de
+
+    </dtml-sendmail>
+
+    <center>
+    <br>
+    Die Nachricht wurde versendet.<br>
+    <br>
+    <form>
+        <input type="button" value="  Ok  " onclick="window.close()">
+    </form>
+    </center>
+    
+<dtml-else>
+
+    <dtml-with expr="gelb.text_artikel_versenden"><dtml-var tag></dtml-with><br>
+    
+    <form name="f" action="<dtml-var absolute_url>" method="PUT" onsubmit="return validateForm()">
+    Ein Link auf diese Seite <b><dtml-var expr="REQUEST.titel"></b> (<dtml-var expr="REQUEST.url">) geht an...
+    <br>
+    E-Mail Adresse Empf&auml;nger/in<sup>*</sup><br>
+    <input name="email_to" type="text" size="30"class="dialogTellAFriend"><br>
+    <br>
+    Verschickt hat ihn...<br>
+    Dein Name<br>
+    <input name="name" type="text" size="30" class="dialogTellAFriend"><br>
+    Deine E-Mail Adresse<sup>*</sup><br>
+    <input name="email_from" type="text" size="30" class="dialogTellAFriend"><br>
+    Noch eine pers&ouml;nliche Nachricht?<sup>&nbsp;</sup><br>
+    <textarea name="message" cols="30" rows="3" class="dialogTellAFriend"></textarea><br>
+    <small><sup>*</sup> Angabe erforderlich</small><br>
+    <br>
+    <input type="submit" value="Senden" class="buttonDialogTellAFriend">&nbsp;&nbsp;&nbsp;&nbsp;<input type="button" value="Abbrechen" onclick="window.close()" class="buttonDialogTellAFriend">
+    <input name="titel" type="hidden" value="<dtml-var expr="REQUEST.titel">">
+    <input name="url" type="hidden" value="<dtml-var expr="REQUEST.url">">
+    </form>
+</dtml-if>
+
+</body>
+</html>

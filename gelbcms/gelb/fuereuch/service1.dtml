@@ -1,0 +1,6 @@
+<dtml-var gelb_top.dtml>
+
+<h1>F&uuml;r Euch</h1>
+jaja
+
+<dtml-var gelb_bottom.dtml>

@@ -1,0 +1,27 @@
+<dtml-comment>
+*******************************************************************************
+
+Project:  gelb cms
+
+File:     /gelb/index_html
+
+          Start page.
+
+Version:  0.9
+Date:     2004-02-25
+Author:   Jens Gulden
+   
+*******************************************************************************
+</dtml-comment>
+
+<dtml-var gelb_top.dtml>
+
+<dtml-if expr="this().getId()=='' or this().getId()=='gelb'">
+    <dtml-call expr="REQUEST.set('listParent',REQUEST.get('neuesteAusgabe'))">
+<dtml-else>
+    <dtml-call expr="REQUEST.set('listParent',this())">
+</dtml-if>
+
+<dtml-var list_page.dtml>
+
+<dtml-var gelb_bottom.dtml>

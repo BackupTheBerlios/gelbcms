@@ -1,0 +1,226 @@
+<dtml-comment>
+*******************************************************************************
+
+Project:  gelb cms
+
+File:     /Control_Panel/Products/GELB_Site/GELB_Artikel/.../index_html
+
+          This is the root index_html method.
+          It calls gelb/index_html inorder to make page requests to "/"
+          identical to requests to "/gelb/".
+
+Version:  0.9
+Date:     2004-02-25
+Author:   Jens Gulden
+   
+*******************************************************************************
+</dtml-comment>
+
+<dtml-var gelb_top.dtml>
+
+<div class="artikel">
+    <h1><dtml-var title></h1>
+    <h2><dtml-var subtitle></h2>
+
+    <dtml-comment>
+    --- get layout-pattern string ---------------------------------------------
+    </dtml-comment>
+    <dtml-if expr="(_.len(layout)>0) and (layout[0]!='')">
+        <dtml-call expr="REQUEST.set('layoutPattern',layout)">
+    <dtml-else>
+        <dtml-call expr="REQUEST.set('layoutPattern',['1,2,3,4,5,6,7,8,9,*'])"> <!-- default -->
+    </dtml-if>
+
+    <dtml-comment>
+    --- transform layout pattern into 2-dim list ------------------------------
+    </dtml-comment>
+    <dtml-call expr="REQUEST.set('layout',[])">
+    <dtml-call expr="REQUEST.set('layoutRows',0)">
+    <dtml-call expr="REQUEST.set('layoutCols',0)">
+    <dtml-in expr="REQUEST.layoutPattern" prefix="layoutrow">
+        <dtml-call expr="REQUEST.set('layoutRows',REQUEST.layoutRows+1)">
+        <dtml-let colList="_.string.split(layoutrow_item)">
+            <dtml-call expr="REQUEST.layout.append(colList)">
+            <dtml-call expr="REQUEST.set('currentCols',_.len(colList))">
+        </dtml-let>
+        <dtml-if expr="REQUEST.currentCols > REQUEST.layoutCols">
+            <dtml-call expr="REQUEST.set('layoutCols',REQUEST.currentCols)">
+        </dtml-if>
+    </dtml-in>
+
+    <dtml-comment>
+    --- create HTML layout ----------------------------------------------------
+    </dtml-comment>
+    <table class="artikel">
+    <dtml-in expr="_.range(0,REQUEST.layoutRows)" prefix="row">
+        <tr>
+        <dtml-in expr="_.range(0,REQUEST.layoutCols)" prefix="col">
+            <dtml-if expr="col_item < _.len(REQUEST.layout[row_item])">
+                <dtml-let items="REQUEST.layout[row_item][col_item]">
+                    <dtml-if expr="(col_item==0) or (items != REQUEST.layout[row_item][col_item-1])">
+                        <dtml-comment>
+                        --- horizontally first one, or new one ----------------
+                        </dtml-comment>
+                        <dtml-if expr="(row_item==0) or (col_item>=_.len(REQUEST.layout[row_item-1])) or (items != REQUEST.layout[row_item-1][col_item])">
+                            <dtml-comment>
+                            --- vertizontally first one, or new one -----------
+                            -lookahead how many of the same follow horizontally
+                            </dtml-comment>
+                            <dtml-call expr="REQUEST.set('nextnew',-1)">
+                            <dtml-in expr="_.range(col_item+1,_.len(REQUEST.layout[row_item])+1)" prefix="lookahead">
+                                <dtml-if expr="(REQUEST.nextnew==-1) and ((lookahead_item>=_.len(REQUEST.layout[row_item])) or (REQUEST.layout[row_item][lookahead_item] != items))">
+                                    <dtml-call expr="REQUEST.set('nextnew',lookahead_item)">
+                                </dtml-if>
+                            </dtml-in>                
+                            <dtml-let colspan="REQUEST.nextnew - col_item">
+                                <dtml-comment>
+                                ---lookahead how many same follow vertically -
+                                </dtml-comment>
+                                <dtml-call expr="REQUEST.set('nextnew',-1)">
+                                <dtml-in expr="_.range(row_item+1,REQUEST.layoutRows+1)" prefix="lookahead">
+                                    <dtml-if expr="(REQUEST.nextnew==-1) and ((lookahead_item>=REQUEST.layoutRows) or (col_item>=_.len(REQUEST.layout[lookahead_item])) or (REQUEST.layout[lookahead_item][col_item] != items))">
+                                        <dtml-call expr="REQUEST.set('nextnew',lookahead_item)">
+                                    </dtml-if>
+                                </dtml-in>
+                                <dtml-let rowspan="REQUEST.nextnew - row_item">
+                                    <dtml-comment>
+                                    --- render cell ---------------------------
+                                    </dtml-comment>
+                                    <td class="artikel" colspan="<dtml-var colspan>" rowspan="<dtml-var rowspan>">
+                                        <dtml-in expr="_.string.split(items,',')" prefix="item">
+                                            <dtml-let item="item_item">
+                                                <dtml-comment>
+                                                --- get additional layout HTML options for item, if specif.
+                                                </dtml-comment>
+                                                <dtml-call expr="REQUEST.set('itemoptions','')">
+                                                <dtml-in expr="options" prefix="opts">
+                                                    <dtml-let opt="_.string.split(opts_item,':')">
+                                                        <dtml-if expr="(_.string.strip(opt[0]) == item) and (_.len(opt)>1)">
+                                                            <dtml-call expr="REQUEST.set('itemoptions',opt[1])">
+                                                        </dtml-if>
+                                                    </dtml-let>
+                                                </dtml-in>
+                                                <dtml-try>
+                                                    <dtml-let index="_.int(item)"> 
+                                                        <dtml-comment>
+                                                        --- image, item is numeric index (+1)
+                                                        </dtml-comment>
+                                                        <dtml-try>
+                                                            <dtml-with "objectValues('Image')[index-1]">
+                                                                <img class="artikel" src="<dtml-var absolute_url>" width="<dtml-var width>" height="<dtml-var height>" <dtml-var "REQUEST.itemoptions">>
+                                                            </dtml-with>
+                                                        <dtml-except>
+                                                            <dtml-comment>
+                                                            --- picture allowed to be missing
+                                                            </dtml-comment>
+                                                        </dtml-try>
+                                                    </dtml-let>
+                                                <dtml-except>
+                                                    <dtml-comment>
+                                                    --- non-numeric item: text
+                                                    </dtml-comment>
+                                                    <dtml-in expr="objectValues('DTML Document')">
+                                                        <dtml-var expr="this()">
+                                                    </dtml-in>
+                                                    <dtml-in expr="objectValues('GELB_Text')">
+                                                        <dtml-var expr="this()">
+                                                    </dtml-in>
+                                                    <dtml-in expr="objectValues('File')">
+                                                        <dtml-var this>
+                                                    </dtml-in>
+                                                </dtml-try>
+                                            </dtml-let>
+                                       </dtml-in>
+                                    </td>
+                                </dtml-let>
+                            </dtml-let>
+                        <dtml-else>
+                            <td></td>
+                        </dtml-if>
+                    <dtml-else>
+                        <td></td>
+                    </dtml-if>
+                </dtml-let>
+            </dtml-if>
+        </dtml-in>
+        </tr>
+    </dtml-in>
+    </table>
+
+    <dtml-comment>
+    --- yellow boxes ----------------------------------------------------------
+    </dtml-comment>
+    <table class="artikelBox"><tr>
+
+    <dtml-comment>
+    --- links -----------------------------------------------------------------
+    </dtml-comment>
+    <dtml-in expr="objectValues('GELB_Link')">
+        <dtml-if sequence-start>
+            <td class="artikelBox">
+            <h1 class="artikelBoxEntry">Links</h1>
+        </dtml-if>
+        <p class="artikelBoxEntryHead">
+            <h2 class="artikelBoxEntry"><dtml-var title></h2>
+            <a href="<dtml-var url>" target="_blank" class="artikelBoxEntry"><dtml-var url></a>
+        </p>
+        <p class="artikelBoxEntry">
+            <dtml-var text>
+        </p>
+        <dtml-if sequence-end>
+            </td>
+        </dtml-if>
+    </dtml-in>
+
+    <dtml-comment>
+    --- Literaturhinweise -----------------------------------------------------
+    </dtml-comment>
+    <dtml-in expr="objectValues('GELB_Literaturhinweis')">
+        <dtml-if sequence-start>
+            <td class="artikelBox">
+            <h1 class="artikelBoxEntry">Literatur</h1>
+        </dtml-if>
+        <p class="artikelBoxEntryHead">
+            <h2 class="artikelBoxEntry"><dtml-var title></h2>
+            von <dtml-var autor>
+        </p>
+        <p class="artikelBoxEntry">
+            <dtml-var text><br>
+            <dtml-var verlag>, <dtml-var jahr>
+        </p>
+        <dtml-if sequence-end>
+            </td>
+        </dtml-if>
+    </dtml-in>
+
+    <dtml-comment>
+    --- Termine ---------------------------------------------------------------
+    </dtml-comment>
+    <dtml-in expr="objectValues('GELB_Termin')">
+        <dtml-if sequence-start>
+            <td class="artikelBox">
+            <h1 class="artikelBoxEntry">Termine</h1>
+        </dtml-if>
+        <p class="artikelBoxEntryHead">
+            <h2 class="artikelBoxEntry"><dtml-var title></h2>
+        </p>
+        <p class="artikelBoxEntry">
+            <dtml-var text>
+        </p>
+        <dtml-if sequence-end>
+            </td>
+        </dtml-if>
+    </dtml-in>
+    </tr></table>
+    <hr size="1" noshade>
+    <dtml-let mode="REQUEST.mode" 
+          anzahlAusgaben="_.len(gelb.archiv.objectValues('Folder'))"
+          aktuelleAusgabe="gelb.archiv.objectValues('Folder')[anzahlAusgaben-1]"
+          >
+        <dtml-in expr="_.string.split(autoren,',')" prefix="author"><dtml-in expr="gelb.ueberuns.autorenverzeichnis.objectItems('GELB_Autor')"><dtml-if expr="getId()==author_item"><dtml-if expr="author_index > 0">, </dtml-if><dtml-var link></dtml-if></dtml-in></dtml-in>
+        | <a href="<dtml-var expr="PARENTS[1].absolute_url()">"><dtml-var expr="PARENTS[1].title"></a> 
+        | <dtml-var expr="PARENTS[1].zeitraum">
+    </dtml-let>
+</div>
+
+<dtml-var gelb_bottom.dtml>

@@ -1,0 +1,97 @@
+<dtml-comment>
+*******************************************************************************
+
+Project:  gelb cms
+
+File:     /gelb_bottom.dtml
+
+          Lower part of navigation.
+
+Version:  0.9
+Date:     2004-02-25
+Author:   Jens Gulden
+   
+*******************************************************************************
+</dtml-comment>
+
+<dtml-if expr="mode!='naviMain'">
+    <dtml-if expr="REQUEST.view!='print'">
+        </td>
+            <td class="seitenleiste">
+                <table class="seitenleisteEintrag"><tr><td class="seitenleisteEintrag" nowrap>
+                    <!-- (dummy comment) -->
+                    <a class="seitenleisteEintrag" href="<dtml-var absolute_url>?view=print" target="_blank" onclick="window.open('&dtml-absolute_url;?view=print','gelb_Druckversion','width=800,height=600,top=50,left=100,resizable=yes,scrollbars=yes,menubar=yes,status=yes');return false"><dtml-with gelb><dtml-with "gelb.icon_print"><img src="&dtml-absolute_url;" align="middle" width="&dtml-width;" height="&dtml-height;" border="0" alt="Druckversion anzeigen"></dtml-with></dtml-with>Druckversion</a>
+                </td></tr></table>
+                <table class="seitenleisteEintrag"><tr><td class="seitenleisteEintrag" nowrap>
+                    <dtml-with gelb><a class="seitenleisteEintrag" href="<dtml-var absolute_url></dtml-with>/link_versenden.dtml?url=<dtml-var absolute_url url_quote>&titel=<dtml-var title url_quote_plus>" onclick="window.open('<dtml-with gelb><dtml-var absolute_url></dtml-with>/link_versenden.dtml?url=<dtml-var absolute_url url_quote>&titel=<dtml-var title url_quote_plus>','gelb_Link_versenden','width=300,height=400,left=350,top=150,resizable=yes,dependent=yes');return false"><dtml-with "gelb.icon_friend"><img src="&dtml-absolute_url;" align="middle" width="&dtml-width;" height="&dtml-height;" border="0" alt="Diesen Link versenden"></dtml-with>Versenden</a><br>
+                </td></tr></table>
+            </td>
+        </tr>
+        <tr>
+            <dtml-comment>
+            --- column for info-boxes -----------------------------------------
+            </dtml-comment>
+            <td valign="top">
+    <dtml-else>
+        <div align="right">
+        <table>
+            <tr>
+               <td>
+    </dtml-if>
+
+    <br>
+    <br>
+    <dtml-call expr="REQUEST.set('boxText',REQUEST.defaultAusgabe.infobox.this())">
+    <dtml-call expr="REQUEST.set('boxClass','infobox')">
+    <dtml-var gelb_box.dtml>
+
+    <dtml-if expr="REQUEST.view!='print'">
+                </td>
+            </tr>
+        </table>
+        </div>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <!--
+            <tr>
+                <td align="right">
+                    <small>copyleft gelb <dtml-var ZopeTime fmt="year"></small>
+                </td>
+            </tr>
+            -->
+        </table>
+
+        <dtml-comment>
+        --- layers for sub-navigation -----------------------------------------
+        </dtml-comment>
+        <dtml-with gelb>
+            <dtml-let aktiverBereichId="REQUEST.aktiverBereichId">
+                <dtml-in expr="(0,1,2,3)" prefix="counter">
+                    <dtml-with expr="objectValues('Folder')[counter_item]">
+                        <dtml-if expr="id!=aktiverBereichId">
+
+                            <div id="layer_&dtml-id;" class="subnavigation">
+                                <table class="subnavigation" width="100%" height="100%"><tr><td class="subnavigation">
+                                    <dtml-let aktuellerBereich="this()">
+                                        <dtml-var list_navigation.dtml>
+                                    </dtml-let>
+                                </td></tr></table>
+                            </div>
+
+                        </dtml-if>
+                    </dtml-with>
+                </dtml-in>
+            </dtml-let>
+        </dtml-with>
+    <dtml-else>
+        <dtml-comment>
+        --- end of print-view
+        </dtml-comment>
+    </dtml-if>
+<dtml-else>
+</dtml-if>
+
+<dtml-var gelb_footer.dtml>

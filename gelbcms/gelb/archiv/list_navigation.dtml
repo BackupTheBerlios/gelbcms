@@ -1,0 +1,51 @@
+<dtml-comment>
+*******************************************************************************
+
+Project:  gelb cms
+
+File:     /gelb/archiv/list_navigation.dtml
+
+          Outputs list of entries in the archive inside a navigator menu-box.
+          This replaces the functionality of /gelb/list_navigation.dtml.
+
+Version:  0.9
+Date:     2004-02-25
+Author:   Jens Gulden
+   
+*******************************************************************************
+</dtml-comment>
+
+<dtml-let maxAusgabeNr="REQUEST.neuesteAusgabeNr">          
+    <dtml-with expr="gelb.archiv">
+        <dtml-if expr="REQUEST.neuesteAusgabeNr==REQUEST.angezeigteAusgabeNr">
+            <span class="archivNavigationHighlight">&gt;&gt; aktuelle Ausgabe</span><br>
+        <dtml-else>
+            <a href="&dtml-absolute_url;/<dtml-var expr="REQUEST.neuesteAusgabeNr" fmt="%.02u">" class="archivNavigation">&gt;&gt; aktuelle Ausgabe</a><br>
+        </dtml-if>
+        <br>
+        <dtml-if expr="PARENTS[0]==gelb.archiv">
+            <span class="archivNavigationHighlight">&gt;&gt; Archiv:</span><br>
+        <dtml-else>
+            <a href="&dtml-absolute_url;" class="archivNavigation">&gt;&gt; Archiv:</a><br>
+        </dtml-if>
+        <table class="archivNavigationListe">
+            <dtml-in expr="_.range(0,(maxAusgabeNr/6)+(_.test(((maxAusgabeNr%6)==0),0,1)))" reverse prefix="row">
+                <tr>
+                    <dtml-in expr="_.range(0,6)" reverse prefix="column">
+                        <dtml-comment>(... no idea why the above is not range(0,5), but this works...)</dtml-comment>
+                        <td class="archivNavigationListe">
+                            <dtml-let ausgabeNr="((row_item*6)+column_item)+1">
+                                <dtml-if expr="ausgabeNr == REQUEST.angezeigteAusgabeNr">
+                                    <span class="archivNavigationHighlight"><dtml-var ausgabeNr fmt="%.02u"></span>
+                                <dtml-elif expr="ausgabeNr <= maxAusgabeNr">
+                                    <a href="&dtml-absolute_url;/<dtml-var ausgabeNr fmt="%.02u">" class="archivNavigation"><dtml-var ausgabeNr fmt="%.02u"></a>
+                                </dtml-if>
+                            </dtml-let>
+                        </td>
+                    </dtml-in>
+                </tr>
+            </dtml-in>
+        </table>
+        <br>
+    </dtml-with>
+</dtml-let>

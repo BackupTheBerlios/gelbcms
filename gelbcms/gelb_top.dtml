@@ -1,0 +1,245 @@
+<dtml-comment>
+*******************************************************************************
+
+Project:  gelb cms
+
+File:     /gelb_top.dtml
+
+          Upper part of navigation.
+
+Version:  0.9
+Date:     2004-02-25
+Author:   Jens Gulden
+   
+*******************************************************************************
+</dtml-comment>
+
+<dtml-var gelb_header.dtml>
+
+<dtml-call expr="REQUEST.set('debug',0)">
+
+<dtml-comment>
+--- deactivated start page at entry
+<dtml-if expr="getId()==''">
+    <dtml-call expr="REQUEST.set('mode','naviMain')">
+<dtml-else>
+    <dtml-call expr="REQUEST.set('mode','navi')">
+</dtml-if>
+</dtml-comment>
+
+<dtml-call expr="REQUEST.set('mode','navi')">
+
+<dtml-if expr="REQUEST.has_key('layoutMode_seitenleisteLinks')">
+<dtml-else>
+    <dtml-call expr="REQUEST.set('layoutMode_seitenleisteLinks','true')">
+</dtml-if>
+
+<dtml-comment>
+--- find newest Ausgabe -------------------------------------------------------
+</dtml-comment>
+<dtml-in expr="gelb.archiv.objectValues('Folder')" prefix="ausgaben" sort="id">
+    <dtml-try>
+        <dtml-if expr="ausgaben_item['freigegeben']">
+            <dtml-call expr="REQUEST.set('neuesteAusgabe',ausgaben_item)">
+            <dtml-call expr="REQUEST.set('neuesteAusgabeNr',_.int(getId()))">
+        </dtml-if>
+        <dtml-except> 
+        <dtml-comment>
+        (attrib "freigegeben" allowed to be missing)
+        </dtml-comment>
+    </dtml-try>
+    <dtml-comment>
+    --- OR ---
+    </dtml-comment>
+    <dtml-if expr="_.SecurityGetUser().getUserName()!='Anonymous User'">
+        <!--authentifizierte User sehen immer letzte erfasste Ausgabe als aktuelle -->
+        <dtml-call expr="REQUEST.set('neuesteAusgabe',ausgaben_item)">
+        <dtml-call expr="REQUEST.set('neuesteAusgabeNr',_.int(getId()))">
+    </dtml-if>
+</dtml-in>
+
+<dtml-comment>
+--- angezeigte Ausgabe finden, 
+--- wenn z.Zt. eine Ausgabe bzw. Teile von ihr angezeigt werden
+</dtml-comment>
+<dtml-call expr="REQUEST.set('angezeigteAusgabeNr',-1)">
+<dtml-try>
+    <dtml-if expr="(this().getId()=='') or (this().getId()=='gelb')"> 
+        <dtml-comment>
+        --- Startseite: neueste Ausgabe als default
+        </dtml-comment>
+        <dtml-call expr="REQUEST.set('angezeigteAusgabe',REQUEST.neuesteAusgabe)">
+        <dtml-call expr="REQUEST.set('angezeigteAusgabeNr',REQUEST.neuesteAusgabeNr)">
+    <dtml-elif expr="PARENTS[1]==gelb.archiv"> 
+        <dtml-comment>
+        --- Inhaltsverzeichnis einer Ausgabe
+        </dtml-comment>
+        <dtml-call expr="REQUEST.set('angezeigteAusgabe',PARENTS[0])">
+        <dtml-call expr="REQUEST.set('angezeigteAusgabeNr',_.int(PARENTS[0].getId()))">
+    <dtml-elif expr="PARENTS[2]==gelb.archiv"> 
+        <dtml-comment>
+        --- Teil einer Ausgabe
+        </dtml-comment>
+        <dtml-call expr="REQUEST.set('angezeigteAusgabe',PARENTS[1])">
+        <dtml-call expr="REQUEST.set('angezeigteAusgabeNr',_.int(PARENTS[1].getId()))">
+    </dtml-if>
+    <dtml-except>
+</dtml-try>
+
+<dtml-comment>
+--- default Ausgabe finden, das ist die Ausgabe, deren Hauptbild, Seitenbild,--
+--- Redaktionsinfo usw. angezeigt wird
+</dtml-comment>
+<dtml-if expr="REQUEST.angezeigteAusgabeNr!=-1">
+    <dtml-call expr="REQUEST.set('defaultAusgabe',REQUEST.angezeigteAusgabe)">
+    <dtml-call expr="REQUEST.set('defaultAusgabeNr',REQUEST.angezeigteAusgabeNr)">
+<dtml-else>
+    <dtml-call expr="REQUEST.set('defaultAusgabe',REQUEST.neuesteAusgabe)">
+    <dtml-call expr="REQUEST.set('defaultAusgabeNr',REQUEST.neuesteAusgabeNr)">
+</dtml-if>
+
+<dtml-comment>
+--- debug info ---
+</dtml-comment>
+<dtml-if expr="REQUEST.debug!=0">
+    defaultAusgabeNr: <dtml-var "REQUEST.defaultAusgabeNr"><br>
+    angzeigteAusgabeNr: <dtml-var "REQUEST.angezeigteAusgabeNr"><br>
+</dtml-if>
+
+<dtml-comment>
+--- HTML output ---------------------------------------------------------------
+</dtml-comment>
+<dtml-if expr="REQUEST.mode!='naviMain'">
+    <dtml-if expr="REQUEST.view!='print'">
+        <table class="haupttabelle">
+            <tr>
+                <td>
+                    <dtml-comment>
+                    --- navigation --------------------------------------------
+                    </dtml-comment>
+                    <table width="100%" class="kopftabelle">
+                        <tr> <dtml-comment>(height ca. 100)</dtml-comment>
+                            <td rowspan="2"> <dtml-comment>(width ca. 300)</dtml-comment>
+                                <dtml-var gelb_navi.dtml>
+                            </td>
+                            <td align="right">
+                                <dtml-with "gelb.logo_gelb_grau"><dtml-var tag></dtml-with>
+                            </td>
+                            <td>
+                                <dtml-with "gelb.logo_gelb"><dtml-var tag></dtml-with>
+                            </td>
+                        </tr>
+                        <tr>
+                            <dtml-comment>
+                            --- main image ------------------------------------
+                            </dtml-comment>
+                            <dtml-with expr="REQUEST.defaultAusgabe.hauptbild">
+                                <dtml-comment>(image ca. 380x200)</dtml-comment>
+                                <td class="hauptbild"><img class="hauptbild" src="&dtml-absolute_url;" width="&dtml-width;" height="&dtml-height;"></td>
+                            </dtml-with>
+                            <dtml-comment>
+                            --- Suche / Impressum-Link ------------------------
+                            </dtml-comment>
+                            <td class="seitenleiste">
+                                <dtml-with expr="gelb.Suche.results">
+                                <form action="&dtml-absolute_url;" method="GET">
+                                </dtml-with>
+                                <table class="suchenKontaktImpressum">
+                                    <tr>
+                                        <td colspan="2" class="suchenKontaktImpressum"><dtml-with expr="gelb.ueberuns.kontakt"><a href="&dtml-absolute_url;" class="noUnderline"></dtml-with>Kontakt</a>&nbsp;|&nbsp;<dtml-with expr="gelb.ueberuns.impressum"><a href="&dtml-absolute_url;" class="noUnderline"></dtml-with>Impressum</a></td>
+                                    </tr>
+                                    <tr>
+                                        <td class="suchenKontaktImpressum"><dtml-with expr="gelb.Suche"><a href="&dtml-absolute_url;" class="noUnderline">Suchen</a></dtml-with></td>
+                                        <td class="suchenInput">&nbsp;<input type="text" name="query" size="15" onchange="submit()" class="suchenInput"></td>
+                                    </tr>    
+                                </table>
+                                </form>
+                                <dtml-if expr="_.SecurityGetUser().getUserName()!='Anonymous User'">
+                                    <br>
+                                    (eingeloggt als: <dtml-var expr="_.SecurityGetUser().getUserName()">)
+                                </dtml-if>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>&nbsp;</td>
+                            <dtml-comment>
+                            --- navigation path -------------------------------
+                            </dtml-comment>
+                            <td class="navigationspfad"> 
+                                <dtml-with "gelb.icon_navi">
+                                    <img src="&dtml-absolute_url;" align="bottom" width="&dtml-width;" height="&dtml-height;" border="0" alt="">
+                                </dtml-with>
+                                <dtml-if expr="(this().getId()!='') and (this().getId()!='gelb')">
+                                    <dtml-in PARENTS reverse start="3">
+                                        <dtml-if sequence-start>
+                                        <dtml-else>
+                                            // 
+                                        </dtml-if>
+                                        <dtml-if sequence-end>
+                                            <dtml-var title_or_id>
+                                        <dtml-else>
+                                            <a href="<dtml-var absolute_url>"><dtml-var title_or_id></a>
+                                        </dtml-if>
+                                    </dtml-in>
+                                <dtml-else>
+                                    <dtml-with gelb>
+                                        <dtml-var title_or_id>
+                                    </dtml-with>
+                                </dtml-if>
+                            </td>
+                            <td>&nbsp;</td>
+                        </tr>
+                    </table>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <dtml-comment>
+                    --- main content area -------------------------------------
+                    </dtml-comment>
+                    <table width="100%">
+                        <tr>
+                            <dtml-if expr="REQUEST.layoutMode_seitenleisteLinks=='true'">
+                                <dtml-comment>
+                                --- left side column --------------------------
+                                </dtml-comment>
+                                <dtml-try>
+                                    <dtml-if expr="this()['seitenbild']">
+                                        <dtml-call expr="REQUEST.set('seitenbild',this().seitenbild)">
+                                    </dtml-if>    
+                                <dtml-except>    
+                                    <dtml-call expr="REQUEST.set('seitenbild','')">
+                                </dtml-try>
+                                <td rowspan="2" class="seitenleisteLinks">
+                                    <dtml-if expr="REQUEST.seitenbild!=''">
+                                        <dtml-with expr="REQUEST.seitenbild"><img class="seitenbild" src="&dtml-absolute_url;" width="&dtml-width;" height="&dtml-height;"></dtml-with>
+                                    <dtml-else>
+                                        <dtml-with expr="gelb.zero"><img src="&dtml-absolute_url;" width="200" height="1"></dtml-with>
+                                    </dtml-if>
+                                </td>
+                                <td rowspan="2" valign="top" width="100%">
+                            <dtml-else>
+                                <dtml-comment>
+                                --- without left side column ------------------
+                                </dtml-comment>
+                                <td colspan="2" rowspan="2" valign="top" width="100%">
+                            </dtml-if>
+    <dtml-else>
+        <dtml-comment>
+        --- print version -----------------------------------------------------
+        </dtml-comment>
+        <table cellpadding="0" border="0"><tr><td>
+            <dtml-with expr="REQUEST.defaultAusgabe.titelicon">
+                <img src="&dtml-absolute_url;" width="&dtml-width;" height="&dtml-height;" align="left">
+            </dtml-with>
+            gelb Archiv - Druckversion<br>
+            &dtml-absolute_url;
+        </td></tr></table>
+        <br>
+    </dtml-if>
+<dtml-else>
+    <dtml-comment>
+    --- pre-start entry page (not used) ---------------------------------------
+    </dtml-comment>
+    <dtml-var gelb_navi.dtml>
+</dtml-if>

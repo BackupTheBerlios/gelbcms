@@ -1,0 +1,21 @@
+<dtml-comment>
+*******************************************************************************
+
+Project:  gelb cms
+
+File:     /index_html
+
+          This is the root index_html method.
+          It calls gelb/index_html inorder to make page requests to "/"
+          identical to requests to "/gelb/".
+
+Version:  0.9
+Date:     2004-02-25
+Author:   Jens Gulden
+   
+*******************************************************************************
+</dtml-comment>
+
+<dtml-with gelb>
+    <dtml-var index_html>
+</dtml-with>

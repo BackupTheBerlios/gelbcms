@@ -1,0 +1,37 @@
+<dtml-comment>
+*******************************************************************************
+
+Project:  gelb cms
+
+File:     /gelb/list_navigation.dtml
+
+          Outputs list of entries inside a navigator menu-box.
+          The functionality of this may be replaced by more specific
+          list_navigation.dtml methods inside main folders (see e.g.
+          /gelb/archiv/list_navigation.dtml).
+
+Version:  0.9
+Date:     2004-02-25
+Author:   Jens Gulden
+   
+*******************************************************************************
+</dtml-comment>
+
+<dtml-with aktuellerBereich>
+    <dtml-in expr="objectItems()" prefix="entry" sort="sort_key">
+        <dtml-if title> 
+            <dtml-comment>
+            only show items which have a title (so avoid title to hide an item)
+            </dtml-comment>
+            <dtml-if expr="PARENTS[0]==entry_item">
+                <p class="subnavigationHighlighted">
+                    &gt;&gt; &dtml-title;
+                </p>
+            <dtml-else>
+                <p class="subnavigation">
+                    <a class="subnavigation" href="&dtml-absolute_url;">&gt;&gt; &dtml-title;</a>
+                </p>
+            </dtml-if>
+        </dtml-if>
+    </dtml-in>
+</dtml-with>
